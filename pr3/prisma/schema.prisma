@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  userName  String
+  password  String
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  records   Record[]
+  notices   Notice[]
+  likes     Like[]
+  comments  Comment[]
+  files     File[]
+}
+
+model Record {
+  id        Int      @id @default(autoincrement())
+  start     Int
+  stop      Int?
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updated   DateTime @updatedAt
+}
+
+model Notice {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  likes     Like[]
+  files     File[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  notice    Notice   @relation(fields: [noticeId], references: [id])
+  noticeId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([noticeId, userId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  url       String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  notice    Notice   @relation(fields: [noticeId], references: [id])
+  noticeId  Int
+}
